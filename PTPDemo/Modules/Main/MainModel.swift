@@ -17,6 +17,6 @@ class MainModel {
     var path: [Destination] = []
 
     init() {
-        path = [.game(.host)]
+        
     }
 }
