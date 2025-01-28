@@ -11,7 +11,7 @@ import SwiftUI
 struct PTPDemoApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainView(model: .init())
         }
     }
 }
