@@ -9,14 +9,24 @@ import Observation
 
 enum Destination: Hashable {
     case game(Player)
+    case profile
 }
 
 @MainActor
 @Observable
 class MainModel {
+    let mpcClient: MPCClient
     var path: [Destination] = []
 
-    init() {
-        
+    @ObservationIgnored private var sessionStarted: Bool = false
+
+    init(mpcClient: MPCClient) {
+        self.mpcClient = mpcClient
+    }
+
+    func startSession(with username: String) {
+        guard !sessionStarted else { return }
+        sessionStarted = true
+        mpcClient.startSession(with: username)
     }
 }

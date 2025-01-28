@@ -52,10 +52,34 @@ struct MainView: View {
                 .buttonStyle(.borderedProminent)
             }
             .navigationTitle("Welcome, \(username)!")
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Menu(
+                        content: {
+                            Button(action: {
+                                model.path.append(.profile)
+                            }) {
+                                Label("Profile", systemImage: "person.wave.2")
+                            }
+                        },
+                        label: {
+                            Image(systemName: "gear")
+                                .contentShape(Rectangle())
+                        })
+                }
+            }
+            .onChange(of: username) { _, newValue in
+                model.mpcClient.updatePeerDisplayName(newValue)
+            }
+            .onAppear {
+                model.startSession(with: username)
+            }
             .navigationDestination(for: Destination.self) { destination in
                 switch destination {
                 case .game(let player):
                     GameView(model: .init(player: player))
+                case .profile:
+                    ProfileView(username: $username)
                 }
             }
         }
@@ -63,5 +87,5 @@ struct MainView: View {
 }
 
 #Preview {
-    MainView(model: .init())
+    MainView(model: .init(mpcClient: .init()))
 }
