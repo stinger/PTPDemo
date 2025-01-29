@@ -39,7 +39,7 @@ class MPCSession: NSObject {
 
         super.init()
         mcSession.delegate = self
-        
+        mcAdvertiser.delegate = self
     }
 
     func invalidate() {
