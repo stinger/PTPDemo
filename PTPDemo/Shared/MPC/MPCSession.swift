@@ -42,15 +42,37 @@ class MPCSession: NSObject {
         mcAdvertiser.delegate = self
     }
 
+    func start() {
+        os_log(.debug, "Start advertising peer")
+        mcAdvertiser.startAdvertisingPeer()
+    }
+
+    func suspend() {
+        os_log(.debug, "Stop advertising peer")
+        mcAdvertiser.stopAdvertisingPeer()
+    }
+
     func invalidate() {
         os_log(.debug, "Invalidate session")
+        suspend()
         mcSession.disconnect()
     }
 
     func updatePeerDisplayName(_ displayName: String) {
-        os_log(.debug, "Updating peer display name: %@")
+        os_log(.debug, "Updating peer display name")
+        invalidate()
 
         localPeerID = .init(displayName: displayName)
+        mcSession = .init(
+            peer: localPeerID, securityIdentity: nil, encryptionPreference: .required)
+        mcAdvertiser = .init(
+            peer: localPeerID,
+            discoveryInfo: [
+                MPCSessionConstants.kKeyIdentity: sessionConfiguration.sessionIdentity
+            ],
+            serviceType: sessionConfiguration.serviceType
+        )
+        start()
     }
 }
 

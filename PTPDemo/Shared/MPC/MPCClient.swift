@@ -14,6 +14,10 @@ class MPCClient {
 
     func startSession(with displayName: String) {
         peerDisplayName = displayName
+        os_log(.debug, "Starting session with display name of %@", peerDisplayName)
+        if session != nil {
+            session?.invalidate()
+        }
 
         let configuration: MPCSessionConfiguration = .init(
             serviceType: "sample",
@@ -24,10 +28,13 @@ class MPCClient {
             sessionConfiguration: configuration,
             localPeerDisplayName: peerDisplayName
         )
+
+        session?.start()
     }
 
     func updatePeerDisplayName(_ displayName: String) {
         os_log(.debug, "Update peer display name")
+        guard !displayName.isEmpty else { return }
         peerDisplayName = displayName
         if let session {
             session.updatePeerDisplayName(peerDisplayName)

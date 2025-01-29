@@ -8,6 +8,7 @@
 import Observation
 
 enum Destination: Hashable {
+    case lookup
     case game(Player)
     case profile
 }

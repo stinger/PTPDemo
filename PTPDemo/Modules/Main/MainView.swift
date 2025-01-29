@@ -42,7 +42,7 @@ struct MainView: View {
             .safeAreaInset(edge: .bottom) {
                 Button(
                     action: {
-                        model.path.append(.game(.host))
+                        model.path.append(.lookup)
                     },
                     label: {
                         Label("Find players", systemImage: "person.line.dotted.person")
@@ -76,6 +76,14 @@ struct MainView: View {
             }
             .navigationDestination(for: Destination.self) { destination in
                 switch destination {
+                case .lookup:
+                    LookupView(
+                        model: .init(
+                            mpcClient: model.mpcClient
+                        ),
+                        username: $username,
+                        path: $model.path
+                    )
                 case .game(let player):
                     GameView(model: .init(player: player))
                 case .profile:
