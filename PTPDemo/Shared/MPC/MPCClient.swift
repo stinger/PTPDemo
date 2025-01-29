@@ -15,7 +15,15 @@ class MPCClient {
     func startSession(with displayName: String) {
         peerDisplayName = displayName
 
-        session = MPCSession(localPeerDisplayName: peerDisplayName)
+        let configuration: MPCSessionConfiguration = .init(
+            serviceType: "sample",
+            sessionIdentity: "com.sparkledev.ptpdemo.sample",
+            maxNumberOfPeers: 1
+        )
+        session = MPCSession(
+            sessionConfiguration: configuration,
+            localPeerDisplayName: peerDisplayName
+        )
     }
 
     func updatePeerDisplayName(_ displayName: String) {

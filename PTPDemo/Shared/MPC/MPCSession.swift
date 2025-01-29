@@ -8,20 +8,38 @@
 import MultipeerConnectivity
 import OSLog
 
+struct MPCSessionConstants {
+    static let kKeyIdentity: String = "identity"
+}
+
+struct MPCSessionConfiguration {
+    let serviceType: String
+    let sessionIdentity: String
+    let maxNumberOfPeers: Int
+}
+
 class MPCSession: NSObject {
     var localPeerID: MCPeerID
     var mcSession: MCSession
+    let sessionConfiguration: MPCSessionConfiguration
 
-    init(localPeerDisplayName: String) {
+    private var mcAdvertiser: MCNearbyServiceAdvertiser
+
+    init(sessionConfiguration: MPCSessionConfiguration, localPeerDisplayName: String) {
+        os_log(.debug, "Multipeer service init")
+        self.sessionConfiguration = sessionConfiguration
         localPeerID = .init(displayName: localPeerDisplayName)
-        mcSession = .init(
+
+        mcSession = .init(peer: localPeerID, securityIdentity: nil, encryptionPreference: .required)
+        mcAdvertiser = .init(
             peer: localPeerID,
-            securityIdentity: nil,
-            encryptionPreference: .required
+            discoveryInfo: [MPCSessionConstants.kKeyIdentity: sessionConfiguration.sessionIdentity],
+            serviceType: sessionConfiguration.serviceType
         )
 
         super.init()
         mcSession.delegate = self
+        
     }
 
     func invalidate() {
@@ -80,5 +98,17 @@ extension MPCSession: MCSessionDelegate {
         withError error: Error?
     ) {
         // pass
+    }
+}
+
+// MARK: - `MCNearbyServiceAdvertiserDelegate`.
+extension MPCSession: MCNearbyServiceAdvertiserDelegate {
+    public func advertiser(
+        _ advertiser: MCNearbyServiceAdvertiser,
+        didReceiveInvitationFromPeer peerID: MCPeerID,
+        withContext context: Data?,
+        invitationHandler: @escaping (Bool, MCSession?) -> Void
+    ) {
+        os_log(.debug, "Received invitation from peer %@", peerID.displayName)
     }
 }
