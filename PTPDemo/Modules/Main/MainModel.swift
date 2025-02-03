@@ -6,6 +6,7 @@
 //
 
 import Observation
+import OSLog
 
 enum Destination: Hashable {
     case lookup
@@ -21,8 +22,20 @@ class MainModel {
 
     @ObservationIgnored private var sessionStarted: Bool = false
 
-    init(mpcClient: MPCClient) {
+    var invitationRequest: InvitationRequest?
+    init(mpcClient: MPCClient, invitationRequest: InvitationRequest? = nil) {
         self.mpcClient = mpcClient
+        self.invitationRequest = invitationRequest
+
+        mpcClient.onPlayerInvite = { [weak self] request in
+            guard let self else { return }
+            os_log(
+                .debug,
+                "Prompting user to accept peer invite from %@",
+                request.peerID.displayName
+            )
+            self.invitationRequest = request
+        }
     }
 
     func startSession(with username: String) {

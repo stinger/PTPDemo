@@ -23,6 +23,9 @@ class MPCSession: NSObject {
     var mcSession: MCSession
     let sessionConfiguration: MPCSessionConfiguration
 
+    var peerInvitationHandler: ((Data?, MCPeerID) -> Void)?
+    var serviceInvitationHandler: ((Bool, MCSession?) -> Void)?
+
     private var mcAdvertiser: MCNearbyServiceAdvertiser
 
     init(sessionConfiguration: MPCSessionConfiguration, localPeerDisplayName: String) {
@@ -132,5 +135,10 @@ extension MPCSession: MCNearbyServiceAdvertiserDelegate {
         invitationHandler: @escaping (Bool, MCSession?) -> Void
     ) {
         os_log(.debug, "Received invitation from peer %@", peerID.displayName)
+        serviceInvitationHandler = invitationHandler
+
+        if self.mcSession.connectedPeers.count < sessionConfiguration.maxNumberOfPeers {
+            peerInvitationHandler?(context, peerID)
+        }
     }
 }

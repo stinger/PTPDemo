@@ -8,9 +8,17 @@
 import MultipeerConnectivity
 import OSLog
 
+struct InvitationRequest: Identifiable {
+    var id: UUID = .init()
+    var peerID: MCPeerID
+    var player: Player
+}
+
 class MPCClient {
     var session: MPCSession?
     var peerDisplayName: String = "Unknown"
+
+    var onPlayerInvite: ((InvitationRequest) -> Void)?
 
     func startSession(with displayName: String) {
         peerDisplayName = displayName
@@ -28,6 +36,16 @@ class MPCClient {
             sessionConfiguration: configuration,
             localPeerDisplayName: peerDisplayName
         )
+
+        session?.peerInvitationHandler = { [weak self] data, peer in
+            guard
+                let data,
+                let player = try? JSONDecoder().decode(Player?.self, from: data)
+            else {
+                return
+            }
+            self?.onPlayerInvite?(.init(peerID: peer, player: player))
+        }
 
         session?.start()
     }

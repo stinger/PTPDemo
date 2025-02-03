@@ -74,6 +74,23 @@ struct MainView: View {
             .onAppear {
                 model.startSession(with: username)
             }
+            .alert(item: $model.invitationRequest) { request in
+                Alert(
+                    title: Text("Game Request"),
+                    message: Text(
+                        "\(request.peerID.displayName) wants to play TicTacToe with you."),
+                    primaryButton: .default(
+                        Text("Join"),
+                        action: {
+                            // todo
+                        }),
+                    secondaryButton: .cancel(
+                        Text("Cancel"),
+                        action: {
+                            // todo
+                        })
+                )
+            }
             .navigationDestination(for: Destination.self) { destination in
                 switch destination {
                 case .lookup:
