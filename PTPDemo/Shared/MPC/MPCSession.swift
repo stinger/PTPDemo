@@ -82,6 +82,29 @@ class MPCSession: NSObject {
         serviceInvitationHandler?(response, mcSession)
         serviceInvitationHandler = nil
     }
+
+    var peerConnectedHandler: ((MCPeerID) -> Void)?
+    private func peerConnected(peerID: MCPeerID) {
+        os_log(.debug, "Peer connected %@", peerID.displayName)
+        if let handler = peerConnectedHandler {
+            DispatchQueue.main.async {
+                handler(peerID)
+            }
+        }
+        if mcSession.connectedPeers.count == sessionConfiguration.maxNumberOfPeers {
+            self.suspend()
+        }
+    }
+
+    var peerDisconnectedHandler: ((MCPeerID) -> Void)?
+    private func peerDisconnected(peerID: MCPeerID) {
+        os_log(.debug, "Peer disconnected %@", peerID.displayName)
+        if let handler = peerDisconnectedHandler {
+            DispatchQueue.main.async {
+                handler(peerID)
+            }
+        }
+    }
 }
 
 // MARK: - `MCSessionDelegate`.
@@ -92,6 +115,16 @@ extension MPCSession: MCSessionDelegate {
         didChange state: MCSessionState
     ) {
         os_log(.debug, "Session peer %@ changed state", peerID.displayName)
+        switch state {
+        case .connected:
+            peerConnected(peerID: peerID)
+        case .notConnected:
+            peerDisconnected(peerID: peerID)
+        case .connecting:
+            break
+        @unknown default:
+            fatalError("Unhandled MCSessionState")
+        }
     }
 
     func session(

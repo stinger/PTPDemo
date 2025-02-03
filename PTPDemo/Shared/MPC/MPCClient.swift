@@ -62,4 +62,23 @@ class MPCClient {
             session.updatePeerDisplayName(peerDisplayName)
         }
     }
+
+    var connectedPeer: MCPeerID?
+    func connectedToPeer(peer: MCPeerID) {
+        if connectedPeer != nil {
+            fatalError("Already connected to a peer.")
+        }
+
+        connectedPeer = peer
+        peerDisplayName = peer.displayName
+    }
+
+    var onPeerDisconnect: ((MCPeerID) -> Void)?
+    func disconnectedFromPeer(peer: MCPeerID) {
+        if connectedPeer == peer {
+            connectedPeer = nil
+        }
+        session?.invalidate()
+        onPeerDisconnect?(peer)
+    }
 }

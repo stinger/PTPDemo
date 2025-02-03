@@ -5,8 +5,8 @@
 //  Created by Ilian Konchev on 28.01.25.
 //
 
-import Observation
 import OSLog
+import Observation
 
 enum Destination: Hashable {
     case lookup

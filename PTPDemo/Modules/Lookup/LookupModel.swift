@@ -29,6 +29,15 @@ class LookupModel {
 
         guard let session = mpcClient.session else { return }
 
+        session.peerConnectedHandler = { [weak self] peerID in
+            guard let self else { return }
+            mpcClient.connectedToPeer(peer: peerID)
+            peers = []
+            os_log(.debug, "Connected to %@", peerID.displayName)
+            mcBrowser?.stopBrowsingForPeers()
+            onConnect(peerID)
+        }
+
         os_log(.debug, "Initializing browser...")
         mcBrowser = .init(
             peer: session.localPeerID,
