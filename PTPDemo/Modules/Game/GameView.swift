@@ -60,7 +60,7 @@ struct GameView: View {
 
             Spacer()
 
-            if model.state.winner != nil {
+            if case Player.host = model.assignedPlayer {
                 Button(action: {
                     model.reset()
                 }) {
