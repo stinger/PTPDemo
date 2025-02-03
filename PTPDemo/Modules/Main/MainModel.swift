@@ -38,6 +38,10 @@ class MainModel {
         }
     }
 
+    func sendInvitationResponse(_ response: Bool) {
+        mpcClient.sendInvitationResponse(response)
+    }
+
     func startSession(with username: String) {
         guard !sessionStarted else { return }
         sessionStarted = true

@@ -77,6 +77,11 @@ class MPCSession: NSObject {
         )
         start()
     }
+
+    func receiveInvitationResponse(_ response: Bool) {
+        serviceInvitationHandler?(response, mcSession)
+        serviceInvitationHandler = nil
+    }
 }
 
 // MARK: - `MCSessionDelegate`.

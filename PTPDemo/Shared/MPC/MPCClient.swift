@@ -50,6 +50,10 @@ class MPCClient {
         session?.start()
     }
 
+    func sendInvitationResponse(_ response: Bool) {
+        session?.receiveInvitationResponse(response)
+    }
+
     func updatePeerDisplayName(_ displayName: String) {
         os_log(.debug, "Update peer display name")
         guard !displayName.isEmpty else { return }

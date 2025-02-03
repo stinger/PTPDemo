@@ -82,12 +82,15 @@ struct MainView: View {
                     primaryButton: .default(
                         Text("Join"),
                         action: {
-                            // todo
+                            model.sendInvitationResponse(true)
+                            withAnimation {
+                                model.path = [.game(request.player)]
+                            }
                         }),
                     secondaryButton: .cancel(
                         Text("Cancel"),
                         action: {
-                            // todo
+                            model.sendInvitationResponse(false)
                         })
                 )
             }
