@@ -36,6 +36,14 @@ class MainModel {
             )
             self.invitationRequest = request
         }
+
+        mpcClient.onPeerDisconnect = { [weak self] peerID in
+            guard let self else { return }
+            os_log(.debug, "Peer disconnected: %@", peerID.displayName)
+            self.invitationRequest = nil
+            mpcClient.restartSession()
+            path = []
+        }
     }
 
     func sendInvitationResponse(_ response: Bool) {

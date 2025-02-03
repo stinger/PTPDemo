@@ -24,14 +24,19 @@ class GameModel {
     }
 
     func moveInitiated(at index: Int) {
-        guard let state = state.moveInitiated(at: index) else { return }
-        assignedPlayer = state.activePlayer
+        guard
+            assignedPlayer == state.activePlayer,
+            let state = state.moveInitiated(at: index)
+        else {
+            return
+        }
+
         client.share(state)
     }
 
     func reset() {
         state = .init(activePlayer: .host)
-        assignedPlayer = state.activePlayer
+
         client.share(state)
     }
 

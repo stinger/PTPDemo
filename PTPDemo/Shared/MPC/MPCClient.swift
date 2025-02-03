@@ -62,6 +62,11 @@ class MPCClient {
         session?.start()
     }
 
+    func restartSession() {
+        guard let session else { return }
+        startSession(with: session.localPeerID.displayName)
+    }
+
     func sendInvitationResponse(_ response: Bool) {
         session?.receiveInvitationResponse(response)
     }
@@ -85,6 +90,17 @@ class MPCClient {
         peerDisplayName = peer.displayName
     }
 
+    func connectedToPeer(peer: MCPeerID, state: GameState) {
+        if connectedPeer != nil {
+            fatalError("Already connected to a peer.")
+        }
+
+        share(state)
+
+        connectedPeer = peer
+        peerDisplayName = peer.displayName
+    }
+    
     var onPeerDisconnect: ((MCPeerID) -> Void)?
     func disconnectedFromPeer(peer: MCPeerID) {
         if connectedPeer == peer {
