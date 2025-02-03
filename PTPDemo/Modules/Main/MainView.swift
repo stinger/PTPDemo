@@ -105,7 +105,7 @@ struct MainView: View {
                         path: $model.path
                     )
                 case .game(let player):
-                    GameView(model: .init(player: player))
+                    GameView(model: .init(mpcClient: model.mpcClient, player: player))
                 case .profile:
                     ProfileView(username: $username)
                 }

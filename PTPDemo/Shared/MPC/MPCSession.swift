@@ -23,6 +23,7 @@ class MPCSession: NSObject {
     var mcSession: MCSession
     let sessionConfiguration: MPCSessionConfiguration
 
+    var peerDataHandler: ((Data, MCPeerID) -> Void)?
     var peerInvitationHandler: ((Data?, MCPeerID) -> Void)?
     var serviceInvitationHandler: ((Bool, MCSession?) -> Void)?
 
@@ -105,6 +106,20 @@ class MPCSession: NSObject {
             }
         }
     }
+
+    func sendDataToAllPeers(data: Data) {
+        os_log(.debug, "Sending data to all peers")
+        sendData(data: data, peers: mcSession.connectedPeers, mode: .reliable)
+    }
+
+    func sendData(data: Data, peers: [MCPeerID], mode: MCSessionSendDataMode) {
+        os_log(.debug, "Sending data to specific peers")
+        do {
+            try mcSession.send(data, toPeers: peers, with: mode)
+        } catch let error {
+            NSLog("Error sending data: \(error)")
+        }
+    }
 }
 
 // MARK: - `MCSessionDelegate`.
@@ -133,6 +148,11 @@ extension MPCSession: MCSessionDelegate {
         fromPeer peerID: MCPeerID
     ) {
         os_log(.debug, "Received data from peer %@", peerID.displayName)
+        if let handler = peerDataHandler {
+            DispatchQueue.main.async {
+                handler(data, peerID)
+            }
+        }
     }
 
     func session(

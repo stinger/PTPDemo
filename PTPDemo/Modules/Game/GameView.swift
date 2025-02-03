@@ -77,6 +77,6 @@ struct GameView: View {
 
 #Preview {
     NavigationStack {
-        GameView(model: .init(player: .host))
+        GameView(model: .init(mpcClient: .init(), player: .host))
     }
 }

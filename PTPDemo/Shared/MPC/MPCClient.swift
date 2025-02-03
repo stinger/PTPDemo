@@ -47,6 +47,18 @@ class MPCClient {
             self?.onPlayerInvite?(.init(peerID: peer, player: player))
         }
 
+        session?.peerDataHandler = { [weak self] data, peer in
+            self?.dataReceivedHandler(data: data, peer: peer)
+        }
+
+        session?.peerConnectedHandler = { [weak self] peer in
+            self?.connectedToPeer(peer: peer)
+        }
+
+        session?.peerDisconnectedHandler = { [weak self] peer in
+            self?.disconnectedFromPeer(peer: peer)
+        }
+
         session?.start()
     }
 
@@ -80,5 +92,29 @@ class MPCClient {
         }
         session?.invalidate()
         onPeerDisconnect?(peer)
+    }
+
+    func share(_ state: GameState) {
+        guard let encodedData = try? JSONEncoder().encode(state) else {
+            fatalError("Unexpectedly failed to encode the moves.")
+        }
+        session?.sendDataToAllPeers(data: encodedData)
+    }
+
+    var onStateUpdate: ((GameState) -> Void)?
+    func dataReceivedHandler(data: Data, peer: MCPeerID) {
+        guard let state = try? JSONDecoder().decode(GameState.self, from: data) else {
+            fatalError("Unexpectedly failed to decode game state.")
+        }
+        receiveState(state, from: peer)
+    }
+
+    func receiveState(_ state: GameState, from peer: MCPeerID) {
+        if connectedPeer != peer {
+            fatalError("Received moves from unexpected peer.")
+        }
+
+        // do something with state
+        onStateUpdate?(state)
     }
 }
