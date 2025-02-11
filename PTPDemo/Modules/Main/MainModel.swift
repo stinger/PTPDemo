@@ -51,7 +51,10 @@ class MainModel {
     }
 
     func startSession(with username: String) {
-        guard !sessionStarted else { return }
+        guard !sessionStarted, !username.isEmpty else {
+            os_log(.debug, "Session already started or username empty")
+            return
+        }
         sessionStarted = true
         mpcClient.startSession(with: username)
     }

@@ -34,10 +34,16 @@ class MPCSession: NSObject {
         self.sessionConfiguration = sessionConfiguration
         localPeerID = .init(displayName: localPeerDisplayName)
 
-        mcSession = .init(peer: localPeerID, securityIdentity: nil, encryptionPreference: .required)
+        mcSession = .init(
+            peer: localPeerID,
+            securityIdentity: nil,
+            encryptionPreference: .required
+        )
         mcAdvertiser = .init(
             peer: localPeerID,
-            discoveryInfo: [MPCSessionConstants.kKeyIdentity: sessionConfiguration.sessionIdentity],
+            discoveryInfo: [
+                MPCSessionConstants.kKeyIdentity: sessionConfiguration.sessionIdentity
+            ],
             serviceType: sessionConfiguration.serviceType
         )
 
